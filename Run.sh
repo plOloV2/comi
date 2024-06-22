@@ -1,13 +1,5 @@
 #!/bin/bash
 
-comp_time() {
-    local start=${EPOCHREALTIME/./}
-    "$@"
-    local exit_code=$?
-    echo >&2 "Compiling time ~$(( (${EPOCHREALTIME/./} - start)/1000 )) ms."
-    return ${exit_code}
-}
-
 errors() {
     local error_code=$?
     if [ $error_code -eq 0 ]; then
@@ -16,9 +8,11 @@ errors() {
          if [ $error_code -eq 1 ]; then
             echo "Error: argc not equal 2. Program returned with code 1."
         elif [ $error_code -eq 2 ]; then
-            echo "Error: prepare_data() error. Program returned with code 2."
+            echo "Error: PrepareData() error. Program returned with code 2."
         elif [ $error_code -eq 3 ]; then
-            echo "Error: future error. Program returned with code 3."
+            echo "Error: CalculateStartDist() failed. Program returned with code 3."
+        elif [ $error_code -eq 4 ]; then
+            echo "Error: PrepareThreads() error. Program returned with code 4."
         fi
     fi
 }
@@ -34,7 +28,7 @@ SCRIPTS_LOCATION="scripts"
 BIN_FILES_LOCATION="bin"
 
 # Compile the source file
-comp_time ./"$SCRIPTS_LOCATION"/compile.sh
+./"$SCRIPTS_LOCATION"/compile.sh
 
 # Check if the compilation was successful
 if [ $? -eq 0 ]; then

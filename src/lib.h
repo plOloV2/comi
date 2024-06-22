@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <memory.h>
 #include <omp.h>
 
@@ -8,9 +9,10 @@ struct Data{
     double* dist;
 };
 
-struct Results{
-    double best[8];
-
+struct Thread{
+    double best;
+    bool* visited;
+    unsigned char visited_count;
 };
 
 int base(int i, int a, int j);                      //calculates positon of distance in dist array
@@ -20,6 +22,8 @@ double Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwe
 char* FullFileName(char* FileName){
 
     char* result = (char *) malloc((strlen(FileName) + 9) * sizeof(char*));
+    if(result == NULL)
+        return NULL;
 
     strcpy(result, "dane/");
     strcat(result, FileName);
@@ -28,9 +32,11 @@ char* FullFileName(char* FileName){
     return result;
 }
 
-struct Data *prepare_data(char* FileName){
+struct Data* PrepareData(char* FileName){
 
     char* FileToOpen = FullFileName(FileName);
+    if(FileToOpen == NULL)
+        return NULL;
 
     FILE* file = fopen(FileToOpen, "r");
 
@@ -53,10 +59,8 @@ struct Data *prepare_data(char* FileName){
 
         numPoints ++;
 
-        if(numPoints >= 40){
-            printf("Too many points");
+        if(numPoints >= 40)
             return NULL;
-        }
 
         fscanf(file, "%d", &points[numPoints]);
     }
@@ -68,14 +72,38 @@ struct Data *prepare_data(char* FileName){
     distSize = (numPoints*(numPoints-1))/2;
 
     struct Data* result = (struct Data*) malloc(sizeof(char) + sizeof(double*));
+    if(result == NULL)
+        return NULL;
+    
 
     result->pointsNum = numPoints;
 
     result->dist = (double*) malloc(distSize * sizeof(double));
+    if(result->dist == NULL)
+        return NULL;
+    
 
     for(int i = 0; i < numPoints - 1; i++)
         for(int j = i+1; j < numPoints; j++)
             result->dist[base(i, numPoints, j)] = Distance(points[i*2], points[i*2+1], points[j*2], points[j*2+1]);
 
     return result;
+}
+
+double CalculateStartDist(struct Data* data){
+    double result = 0;
+
+
+    return result = 0;
+}
+
+struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){
+
+    return NULL;
+}
+
+void PrintStartStats(struct Data* data, double StartDistance){
+
+    printf("Number of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
+
 }
