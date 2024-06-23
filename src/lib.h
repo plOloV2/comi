@@ -20,7 +20,7 @@ struct Thread{                                      //data for only one thread
 
 int base(int i, int a, int j);                      //calculates positon of distance in dist array
 
-double Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen two points
+double Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen 2 points
 
 char* FullFileName(char* FileName){                 //creats char* with path to given file
 
@@ -35,7 +35,7 @@ char* FullFileName(char* FileName){                 //creats char* with path to 
     return result;
 }
 
-struct Data* PrepareData(char* FileName){       //reads data from file, calculates roads lengths and creats data*
+struct Data* PrepareData(char* FileName){           //reads data from file, calculates roads lengths and creats data*
 
     char* FileToOpen = FullFileName(FileName);
     if(FileToOpen == NULL)
@@ -93,7 +93,7 @@ struct Data* PrepareData(char* FileName){       //reads data from file, calculat
     return result;
 }
 
-double CalculateStartDist(struct Data* data){   //uses simple algorithm to calculate some road, this is used in begining as target to beat
+double CalculateStartDist(struct Data* data){       //uses simple algorithm to calculate some road, this is used in begining as target to beat
     double result = 0, smallest = DBL_MAX;
     int best, now, HowMany;
     bool beenThere[data->pointsNum];
@@ -152,9 +152,9 @@ struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){
     return result;
 }
 
-void PrintStartStats(struct Data* data, double StartDistance){  //prints all statictic befour starting the calculations
+void PrintStartStats(struct Data* data, double StartDistance, double time){  //prints all statictic befour starting the calculations
 
-    printf("Number of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
+    printf("Prepare took %fms\nNumber of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", (omp_get_wtime()-time)*1000, data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
 
 }
 

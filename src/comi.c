@@ -5,6 +5,8 @@ struct Thread** threads = NULL;
 
 int main(int argc, char** argv){
 
+    double time = omp_get_wtime();
+
     if(argc != 2)
         return 1;
 
@@ -20,7 +22,10 @@ int main(int argc, char** argv){
     if(threads == NULL)
         return 4;
 
-    PrintStartStats(data, StartDistance);
+    PrintStartStats(data, StartDistance, time);
 
+    time = omp_get_wtime();
+
+    
     return 0;
 }
