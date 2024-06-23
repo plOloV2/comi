@@ -6,12 +6,12 @@
 
 #define DBL_MAX 9223372036854775807;
 
-struct Data{
+struct Data{                                        //holds data for all threads
     unsigned char pointsNum;
     double* dist;
 };
 
-struct Thread{
+struct Thread{                                      //data for only one thread
     double Best;
     bool* Visited;
     unsigned char VisitedCount;
@@ -22,7 +22,7 @@ int base(int i, int a, int j);                      //calculates positon of dist
 
 double Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen two points
 
-char* FullFileName(char* FileName){
+char* FullFileName(char* FileName){                 //creats char* with path to given file
 
     char* result = (char *) malloc((strlen(FileName) + 9) * sizeof(char*));
     if(result == NULL)
@@ -35,7 +35,7 @@ char* FullFileName(char* FileName){
     return result;
 }
 
-struct Data* PrepareData(char* FileName){
+struct Data* PrepareData(char* FileName){       //reads data from file, calculates roads lengths and creats data*
 
     char* FileToOpen = FullFileName(FileName);
     if(FileToOpen == NULL)
@@ -93,7 +93,7 @@ struct Data* PrepareData(char* FileName){
     return result;
 }
 
-double CalculateStartDist(struct Data* data){
+double CalculateStartDist(struct Data* data){   //uses simple algorithm to calculate some road, this is used in begining as target to beat
     double result = 0, smallest = DBL_MAX;
     int best, now, HowMany;
     bool beenThere[data->pointsNum];
@@ -125,7 +125,8 @@ double CalculateStartDist(struct Data* data){
     return result + data->dist[base(0, data->pointsNum, now)];
 }
 
-struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){
+struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){    //creats Thread* structure and initializes it
+
     struct Thread** result = (struct Thread**) malloc(sizeof(struct Thread*)*8);
     if(result == NULL)
         return NULL;
@@ -151,12 +152,12 @@ struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){
     return result;
 }
 
-void PrintStartStats(struct Data* data, double StartDistance){
+void PrintStartStats(struct Data* data, double StartDistance){  //prints all statictic befour starting the calculations
 
     printf("Number of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
 
 }
 
 void CalculateBestRoad(){
-    
+
 }
