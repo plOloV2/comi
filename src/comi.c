@@ -14,18 +14,21 @@ int main(int argc, char** argv){
     if(data == NULL)
         return 2;
     
-    double StartDistance = CalculateStartDist(data);
-    if(StartDistance == 0)
+    float Distance = CalculateStartDist(data);
+    if(Distance == 0)
         return 3;
 
-    threads = PrepareThreads(StartDistance, data->pointsNum);
+    threads = PrepareThreads(Distance, data->pointsNum);
     if(threads == NULL)
         return 4;
 
-    PrintStartStats(data, StartDistance, time);
+    PrintStartStats(data, Distance, time);
 
     time = omp_get_wtime();
 
-    
+
+
+    PrintEndStats(time, Distance);
+
     return 0;
 }

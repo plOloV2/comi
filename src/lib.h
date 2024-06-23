@@ -8,11 +8,11 @@
 
 struct Data{                                        //holds data for all threads
     unsigned char pointsNum;
-    double* dist;
+    float* dist;
 };
 
 struct Thread{                                      //data for only one thread
-    double Best;
+    float Best;
     bool* Visited;
     unsigned char VisitedCount;
     unsigned char Now;
@@ -20,7 +20,7 @@ struct Thread{                                      //data for only one thread
 
 int base(int i, int a, int j);                      //calculates positon of distance in dist array
 
-double Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen 2 points
+float Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen 2 points
 
 char* FullFileName(char* FileName){                 //creats char* with path to given file
 
@@ -74,14 +74,14 @@ struct Data* PrepareData(char* FileName){           //reads data from file, calc
 
     distSize = (numPoints*(numPoints-1))/2;
 
-    struct Data* result = (struct Data*) malloc(sizeof(char) + sizeof(double*));
+    struct Data* result = (struct Data*) malloc(sizeof(char) + sizeof(float*));
     if(result == NULL)
         return NULL;
     
 
     result->pointsNum = numPoints;
 
-    result->dist = (double*) malloc(distSize * sizeof(double));
+    result->dist = (float*) malloc(distSize * sizeof(float));
     if(result->dist == NULL)
         return NULL;
     
@@ -93,8 +93,8 @@ struct Data* PrepareData(char* FileName){           //reads data from file, calc
     return result;
 }
 
-double CalculateStartDist(struct Data* data){       //uses simple algorithm to calculate some road, this is used in begining as target to beat
-    double result = 0, smallest = DBL_MAX;
+float CalculateStartDist(struct Data* data){       //uses simple algorithm to calculate some road, this is used in begining as target to beat
+    float result = 0, smallest = DBL_MAX;
     int best, now, HowMany;
     bool beenThere[data->pointsNum];
 
@@ -125,14 +125,14 @@ double CalculateStartDist(struct Data* data){       //uses simple algorithm to c
     return result + data->dist[base(0, data->pointsNum, now)];
 }
 
-struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){    //creats Thread* structure and initializes it
+struct Thread** PrepareThreads(float StartDistance, unsigned char NumOfPoints){    //creats Thread* structure and initializes it
 
     struct Thread** result = (struct Thread**) malloc(sizeof(struct Thread*)*8);
     if(result == NULL)
         return NULL;
 
     for(int i = 0; i < 8; i++){
-        result[i] = (struct Thread*) malloc(sizeof(double) + sizeof(bool*) + sizeof(char)*2);
+        result[i] = (struct Thread*) malloc(sizeof(float) + sizeof(bool*) + sizeof(char)*2);
         if(result[i] == NULL)
             return NULL;
 
@@ -152,9 +152,41 @@ struct Thread** PrepareThreads(double StartDistance, unsigned char NumOfPoints){
     return result;
 }
 
-void PrintStartStats(struct Data* data, double StartDistance, double time){  //prints all statictic befour starting the calculations
+void PrintStartStats(struct Data* data, float StartDistance, double time){  //prints all statictic befour starting the calculations
 
     printf("Prepare took %fms\nNumber of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", (omp_get_wtime()-time)*1000, data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
+
+}
+
+void PrintEndStats(double time, float result){     //prints all statictic after calculations
+
+    int days = 0, houres = 0, minutes = 0, seconds = 0;
+
+    time = omp_get_wtime() - time;
+
+    while(time >= 86400){
+        time -= 86400;
+        days++;
+    }
+
+    while(time >= 3600){
+        time -= 3600;
+        houres++;
+    }
+
+    while(time >= 60){
+        time -= 60;
+        minutes++;
+    }
+
+    while(time >= 1){
+        time -= 1;
+        seconds++;
+    }
+
+    time *= 1000;   
+
+    printf("\n\nAll took %dd, %dh, %dm, %ds, %fms\nLenghts of best raod is: %f", days, houres, minutes, seconds, time, result);
 
 }
 
