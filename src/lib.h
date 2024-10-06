@@ -28,7 +28,7 @@ char* FullFileName(char* FileName){                 //creats char* with path to 
     if(result == NULL)
         return NULL;
 
-    strcpy(result, "dane/");
+    strcpy(result, "data/");
     strcat(result, FileName);
     strcat(result, ".txt");
 
