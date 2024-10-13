@@ -20,7 +20,7 @@ struct Thread{                                      //data for only one thread
 
 int base(int i, int a, int j);                      //calculates positon of distance in dist array
 
-float Distance(int x1, int y1, int x2, int y2);    //calculates distance beetwen 2 points
+float Distance(int x1, int y1, int x2, int y2);     //calculates distance beetwen 2 points
 
 char* FullFileName(char* FileName){                 //creats char* with path to given file
 
