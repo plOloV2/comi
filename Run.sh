@@ -13,6 +13,8 @@ errors() {
             echo "Error: CalculateStartDist() failed. Program returned with code 3."
         elif [ $error_code -eq 4 ]; then
             echo "Error: PrepareThreads() error. Program returned with code 4."
+        elif [ $error_code -eq 5 ]: then
+            echo "Error: CalculateBestRoad() failed. Program returned with code 5."
         fi
     fi
 }

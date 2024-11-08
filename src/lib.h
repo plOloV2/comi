@@ -16,6 +16,12 @@ struct Thread{                                      //data for only one thread
     bool* Visited;
     unsigned char VisitedCount;
     unsigned char Now;
+    int* order;
+};
+
+struct Results{                                     //stores end results
+    float distance;
+    int* order;
 };
 
 int base(int i, int a, int j);                      //calculates positon of distance in dist array
@@ -55,6 +61,8 @@ struct Data* PrepareData(char* FileName){           //reads data from file, calc
     }
     
     points = (int*) malloc(40 * sizeof(int));
+    if(points == NULL)
+        return NULL;
 
     fscanf(file, "%d", &points[numPoints]);
 
@@ -90,13 +98,26 @@ struct Data* PrepareData(char* FileName){           //reads data from file, calc
         for(int j = i+1; j < numPoints; j++)
             result->dist[base(i, numPoints, j)] = Distance(points[i*2], points[i*2+1], points[j*2], points[j*2+1]);
 
+    free(points);
+    points = NULL;
+
     return result;
 }
 
-float CalculateStartDist(struct Data* data){       //uses simple algorithm to calculate some road, this is used in begining as target to beat
-    float result = 0, smallest = DBL_MAX;
+struct Results* CalculateStartDist(struct Data* data){       //uses simple algorithm to calculate some road, this is used in begining as target to beat
+    float smallest = DBL_MAX;
     int best, now, HowMany;
     bool beenThere[data->pointsNum];
+
+    struct Results* results = (struct Results*) malloc(sizeof(float) + sizeof(int*));
+    if(results == NULL)
+        return NULL;
+
+    results->order = (int*) malloc(sizeof(int) * (data->pointsNum + 2));
+    if(results->order == NULL)
+        return NULL;
+
+    results->order[0] = data->pointsNum;
 
     for(int i = 1; i < data->pointsNum; i++)
         beenThere[i] = false;
@@ -104,6 +125,8 @@ float CalculateStartDist(struct Data* data){       //uses simple algorithm to ca
     beenThere[0] = true;
     now = 0;
     HowMany = 1;
+    results->order[1] = 0;
+
 
     while(HowMany < data->pointsNum){
         for(int i = 0; i < data->pointsNum; i++){
@@ -113,25 +136,27 @@ float CalculateStartDist(struct Data* data){       //uses simple algorithm to ca
             }
         }
 
-        result += smallest;
+        results->distance += smallest;
+        results->order[HowMany++] = best;
         beenThere[best] = true;
         now = best;
-        HowMany++;
         smallest = DBL_MAX;
 
     }
     
+    results->distance += data->dist[base(0, data->pointsNum, now)];
+    results->order[data->pointsNum + 1] = 0;
 
-    return result + data->dist[base(0, data->pointsNum, now)];
+    return results; 
 }
 
-struct Thread** PrepareThreads(float StartDistance, unsigned char NumOfPoints){    //creats Thread* structure and initializes it
+struct Thread** PrepareThreads(float StartDistance, unsigned char NumOfPoints, unsigned char NumOfThreads){    //creats Thread* structure and initializes it
 
-    struct Thread** result = (struct Thread**) malloc(sizeof(struct Thread*)*8);
+    struct Thread** result = (struct Thread**) malloc(sizeof(struct Thread*) * NumOfThreads);
     if(result == NULL)
         return NULL;
 
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < NumOfThreads; i++){
         result[i] = (struct Thread*) malloc(sizeof(float) + sizeof(bool*) + sizeof(char)*2);
         if(result[i] == NULL)
             return NULL;
@@ -152,13 +177,15 @@ struct Thread** PrepareThreads(float StartDistance, unsigned char NumOfPoints){ 
     return result;
 }
 
-void PrintStartStats(struct Data* data, float StartDistance, double time){  //prints all statictic befour starting the calculations
+void PrintStartStats(struct Data* data, struct Results* results, double time){  //prints all statictic befour starting the calculations
 
-    printf("Prepare took %fms\nNumber of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\n", (omp_get_wtime()-time)*1000, data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, StartDistance);
-
+    printf("Prepare took %fms\nNumber of points: %d\nNumber of all roads: %d\nNot optimized distance: %f\nOrder of points: ", (omp_get_wtime()-time)*1000, data->pointsNum, (data->pointsNum*(data->pointsNum-1))/2, results->distance);
+    for(int i = 1; i < results->order[0]; i++)
+        printf("%d ", results->order[i]);
+    
 }
 
-void PrintEndStats(double time, float result){     //prints all statictic after calculations
+void PrintEndStats(double time, struct Results* result){     //prints all statictic after calculations
 
     int days = 0, houres = 0, minutes = 0, seconds = 0;
 
@@ -186,10 +213,24 @@ void PrintEndStats(double time, float result){     //prints all statictic after 
 
     time *= 1000;   
 
-    printf("\n\nAll took %dd, %dh, %dm, %ds, %fms\nLenghts of best raod is: %f", days, houres, minutes, seconds, time, result);
+    printf("\n\nAll took %dd, %dh, %dm, %ds, %fms\nLenghts of best raod is: %f\nOrder of points: ", days, houres, minutes, seconds, time, result->distance);
+    for(int i = 1; i < result->order[0]; i++)
+        printf("%d ", result->order[i]);
+    
 
 }
 
-void CalculateBestRoad(){
+void CalculateBestRoad(struct Results* results, struct Thread** threads, struct Data* data, unsigned char NumOfThreads){
 
+
+
+
+    return;
+}
+
+bool Calc(struct Results* results, struct Thread** threads, struct Data* data){
+
+
+
+    return true;
 }
