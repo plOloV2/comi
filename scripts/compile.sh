@@ -41,7 +41,7 @@ mkdir -p "$BIN_FILES_LOCATION"
 
 # Compile the source file
 echo "Compiling program with flags $FLAGS"
-comp_time gcc "$SOURCE_FILES_LOCATION/$SOURCE_FILE" "$SOURCE_FILES_LOCATION/$DEPEN_1_FILE" "$SOURCE_FILES_LOCATION/$DEPEN_2_FILE" -o "$BIN_FILES_LOCATION/$OUTPUT_BINARY" "$FLAGS" -g
+comp_time aarch64-linux-gnu-gcc "$SOURCE_FILES_LOCATION/$SOURCE_FILE" "$SOURCE_FILES_LOCATION/$DEPEN_1_FILE" "$SOURCE_FILES_LOCATION/$DEPEN_2_FILE" -o "$BIN_FILES_LOCATION/$OUTPUT_BINARY" "$FLAGS" -g
 
 # Check if the compilation was successful
 if [ $? -eq 0 ]; then

@@ -12,11 +12,13 @@ struct Data{                                        //holds data for all threads
 };
 
 struct Thread{                                      //data for only one thread
-    float Best;
-    bool* Visited;
-    unsigned char VisitedCount;
-    unsigned char Now;
+    float bestRoad;
+    float road;
+    bool* visited;
+    unsigned char visitedCount;
+    unsigned char now;
     int* order;
+    int* bestOrder;
 };
 
 struct Results{                                     //stores end results
@@ -161,17 +163,17 @@ struct Thread** PrepareThreads(float StartDistance, unsigned char NumOfPoints, u
         if(result[i] == NULL)
             return NULL;
 
-        result[i]->Best = StartDistance;
-        result[i]->VisitedCount = 1;
-        result[i]->Now = 0;
-        result[i]->Visited = (bool*) malloc(sizeof(bool)*NumOfPoints);
-        if(result[i]->Visited == NULL)
+        result[i]->bestRoad = StartDistance;
+        result[i]->visitedCount = 1;
+        result[i]->now = 0;
+        result[i]->visited = (bool*) malloc(sizeof(bool)*NumOfPoints);
+        if(result[i]->visited == NULL)
             return NULL;
         
         for(int j = 1; j < NumOfPoints; j++)
-            result[i]->Visited[j] = false;
+            result[i]->visited[j] = false;
 
-        result[i]->Visited[0] = true;
+        result[i]->visited[0] = true;
     }
 
     return result;
@@ -228,9 +230,42 @@ void CalculateBestRoad(struct Results* results, struct Thread** threads, struct 
     return;
 }
 
-bool Calc(struct Results* results, struct Thread** threads, struct Data* data){
+void Calc(struct Thread** threads, struct Data* data){
+    short id = omp_get_thread_num();
+    if(threads[id]->road >= threads[id]->bestRoad)
+        return;
 
+    if(threads[id]->visitedCount == data->pointsNum){
+        threads[id]->bestRoad = threads[id]->road;
+        // memcpy threads[id]->bestOrder from threads[id]->order
+        return;
+    }
 
+    for(int i = 0; i < data->pointsNum; i++){
+        if(threads[id]->visited[i] && (i + 2) < data->pointsNum)
+            i++;
 
-    return true;
+        float section;
+        unsigned char prevNow;
+        
+        section = data->dist[base(i, data->pointsNum, threads[id]->now)];
+
+        prevNow = threads[id]->now;
+
+        threads[id]->now = i;
+        threads[id]->order[threads[id]->visitedCount] = i;
+        threads[id]->visitedCount++;
+        threads[id]->road += section;
+        threads[id]->visited[i] = true;
+        
+        Calc(threads, data);
+
+        threads[id]->now = prevNow;
+        threads[id]->visitedCount--;
+        threads[id]->road -= section;
+        threads[id]->visited[i] = false;        
+        
+    }
+
+    return;
 }
